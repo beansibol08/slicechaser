@@ -1,0 +1,115 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  # Unit tests + a headless OpenGL run of the real plugin binaries (Mesa software renderer).
+  plugin-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install OpenGL/EGL
+        run: sudo apt-get update && sudo apt-get install -y libegl-dev libgl-dev libgl1-mesa-dri libegl-mesa0
+      - name: Configure
+        run: cmake -S slicechaser/plugin -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS=-DDEBUG -DSLICECHASER_GL_TEST=ON
+      - name: Build
+        run: cmake --build build -j
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+  plugin-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S slicechaser/plugin -B build -A x64
+      - name: Build
+        run: cmake --build build --config Release
+      - name: Test
+        run: ctest --test-dir build -C Release --output-on-failure
+      - uses: actions/upload-artifact@v4
+        with:
+          name: plugins-windows
+          path: build/out/*.dll
+
+  plugin-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure (universal arm64 + x86_64)
+        run: cmake -S slicechaser/plugin -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build -j
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+      - name: Ad-hoc sign and zip
+        run: |
+          cd build/out
+          for b in *.bundle; do codesign --force --deep -s - "$b"; lipo -info "$b/Contents/MacOS/"*; done
+          ditto -c -k --keepParent SliceChaser.bundle SliceChaser.bundle.zip
+          ditto -c -k --keepParent SliceBumper.bundle SliceBumper.bundle.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: plugins-macos
+          path: build/out/*.bundle.zip
+
+  editor-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: slicechaser/editor
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm test
+      - name: UI test in headless Chromium
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+          npm run test:ui
+
+  editor-dist:
+    needs: editor-tests
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: slicechaser/editor
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false' # unsigned builds
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm run dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: editor-${{ runner.os }}
+          path: |
+            slicechaser/editor/dist/*.exe
+            slicechaser/editor/dist/*.dmg
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [plugin-tests, plugin-windows, plugin-macos, editor-dist]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*
