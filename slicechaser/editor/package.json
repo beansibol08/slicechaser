@@ -1,0 +1,29 @@
+{
+  "name": "slicechaser-editor",
+  "productName": "SliceChaser",
+  "version": "1.0.0",
+  "description": "Build slice chases for Resolume from your Advanced Output setup",
+  "main": "main.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test tests/lib.test.js",
+    "test:ui": "node tests/ui.test.js",
+    "dist": "electron-builder --publish never",
+    "dist:win": "electron-builder --win --publish never",
+    "dist:mac": "electron-builder --mac --publish never"
+  },
+  "devDependencies": {
+    "electron": "^38.0.0",
+    "electron-builder": "^26.0.0"
+  },
+  "build": {
+    "appId": "com.slicechaser.editor",
+    "productName": "SliceChaser",
+    "files": ["main.js", "preload.js", "renderer/**/*"],
+    "directories": { "output": "dist" },
+    "win": { "target": [{ "target": "nsis", "arch": ["x64"] }, { "target": "portable", "arch": ["x64"] }] },
+    "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true },
+    "mac": { "target": [{ "target": "dmg", "arch": ["universal"] }], "category": "public.app-category.video", "identity": null }
+  }
+}

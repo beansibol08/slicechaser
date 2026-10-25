@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<XmlState name="Stage &amp; wings">
+	<versionInfo name="Resolume Arena" majorVersion="7" minorVersion="23" microVersion="0" revision="0"/>
+	<ScreenSetup name="ScreenSetup">
+		<Params name="ScreenSetupParams"/>
+		<CurrentCompositionTextureSize width="1920" height="1080"/>
+		<screens>
+			<Screen name="Screen 1" uniqueId="100">
+				<Params name="Params">
+					<Param name="Name" T="STRING" default="" value="LED wall"/>
+				</Params>
+				<layers>
+					<Slice uniqueId="11">
+						<Params name="Common">
+							<Param name="Name" T="STRING" default="Layer" value="Left wing"/>
+							<Param name="Enabled" T="BOOL" default="1" value="1"/>
+						</Params>
+						<InputRect orientation="0">
+							<v x="0" y="0"/>
+							<v x="480" y="0"/>
+							<v x="480" y="1080"/>
+							<v x="0" y="1080"/>
+						</InputRect>
+						<OutputRect orientation="0">
+							<v x="0" y="0"/>
+							<v x="480" y="0"/>
+							<v x="480" y="1080"/>
+							<v x="0" y="1080"/>
+						</OutputRect>
+					</Slice>
+					<Slice uniqueId="12">
+						<Params name="Common">
+							<Param name="Name" T="STRING" default="Layer" value="Center"/>
+							<Param name="Enabled" T="BOOL" default="1" value="0"/>
+						</Params>
+						<InputRect orientation="0">
+							<v x="480" y="270"/>
+							<v x="1440" y="270"/>
+							<v x="1440" y="810"/>
+							<v x="480" y="810"/>
+						</InputRect>
+					</Slice>
+					<Slice uniqueId="13">
+						<Params name="Common">
+							<Param name="Name" T="STRING" default="Layer" value="Right wing (rotated)"/>
+						</Params>
+						<!-- 400 wide x 200 tall rect, rotated 90 degrees clockwise -->
+						<InputRect orientation="0">
+							<v x="1800" y="100"/>
+							<v x="1800" y="500"/>
+							<v x="1600" y="500"/>
+							<v x="1600" y="100"/>
+						</InputRect>
+					</Slice>
+					<Mask uniqueId="14">
+						<Params name="Common">
+							<Param name="Name" T="STRING" default="Mask" value="Output mask"/>
+						</Params>
+						<InputRect orientation="0">
+							<v x="0" y="0"/><v x="10" y="0"/><v x="10" y="10"/><v x="0" y="10"/>
+						</InputRect>
+					</Mask>
+				</layers>
+			</Screen>
+			<Screen name="Screen 2" uniqueId="200">
+				<Params name="Params">
+					<Param name="Name" T="STRING" default="" value="Floor"/>
+				</Params>
+				<layers>
+					<Polygon uniqueId="21">
+						<Params name="Common">
+							<Param name="Name" T="STRING" default="Layer" value="Triangle"/>
+						</Params>
+						<InputRect orientation="0">
+							<v x="600" y="900"/><v x="1300" y="900"/><v x="1300" y="1080"/><v x="600" y="1080"/>
+						</InputRect>
+						<InputContour>
+							<points>
+								<v x="600" y="1080"/>
+								<v x="950" y="900"/>
+								<v x="1300" y="1080"/>
+							</points>
+						</InputContour>
+					</Polygon>
+					<Slice uniqueId="22">
+						<Params name="Common">
+							<Param name="Name" T="STRING" default="Layer" value="Broken"/>
+						</Params>
+					</Slice>
+				</layers>
+			</Screen>
+			<DmxScreen name="Lumiverse" uniqueId="300">
+				<layers>
+					<Slice uniqueId="31">
+						<InputRect orientation="0">
+							<v x="0" y="0"/><v x="5" y="0"/><v x="5" y="5"/><v x="0" y="5"/>
+						</InputRect>
+					</Slice>
+				</layers>
+			</DmxScreen>
+		</screens>
+	</ScreenSetup>
+</XmlState>

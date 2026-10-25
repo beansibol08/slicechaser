@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:">
+  <title>SliceChaser</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span>SliceChaser</div>
+    <div class="source">
+      <label for="sourceSelect">Slices from</label>
+      <select id="sourceSelect" title="Advanced Output file the slices are read from"></select>
+      <button id="openSource" class="ghost">Open file…</button>
+      <button id="reloadSource" class="ghost" title="Read the file again (it also reloads by itself when Arena saves it)">Reload</button>
+    </div>
+    <div class="save" id="saveStatus" role="status" aria-live="polite">
+      <span class="save-dot" aria-hidden="true"></span><span id="saveText">Not saved yet</span>
+      <button id="revealFile" class="ghost small">Show file</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <aside class="panel sequences" aria-label="Sequences">
+      <div class="panel-head">
+        <h2>Sequences</h2>
+        <div class="row tight">
+          <button id="upSeq" class="ghost small" title="Move up" aria-label="Move sequence up">▲</button>
+          <button id="downSeq" class="ghost small" title="Move down" aria-label="Move sequence down">▼</button>
+          <button id="newSeq" class="small" title="New empty sequence">New</button>
+        </div>
+      </div>
+      <ul id="seqList" class="seq-list"></ul>
+      <div class="seq-actions">
+        <button id="dupSeq" class="ghost small">Duplicate</button>
+        <button id="renameSeq" class="ghost small">Rename</button>
+        <button id="delSeq" class="ghost small danger">Delete</button>
+      </div>
+
+      <section class="factory" aria-labelledby="factoryTitle">
+        <h2 id="factoryTitle">Generate</h2>
+        <select id="patternSelect" aria-label="Pattern"></select>
+        <label class="check"><input type="checkbox" id="mergeAligned" checked> Light aligned slices together</label>
+        <label class="check"><input type="checkbox" id="enabledOnly" checked> Skip disabled slices</label>
+        <div class="row">
+          <button id="genNew">Create sequence</button>
+          <button id="genReplace" class="ghost">Replace steps</button>
+        </div>
+      </section>
+    </aside>
+
+    <section class="stage-area">
+      <div class="stage-wrap" id="stageWrap">
+        <canvas id="stage" aria-label="Composition with slices. Click a slice to toggle it in the current step; drag to paint."></canvas>
+        <div class="empty" id="emptyStage" hidden>
+          <p id="emptyText"></p>
+          <button id="emptyOpen">Open an Advanced Output file</button>
+        </div>
+        <div class="hover-name" id="hoverName" hidden></div>
+      </div>
+
+      <div class="transport">
+        <button id="playBtn" class="play" aria-pressed="false">Play</button>
+        <label>BPM <input type="number" id="bpm" min="20" max="300" value="128"></label>
+        <label title="How many beats one pass through the sequence takes. Match the Step parameter's BPM Sync setting in Resolume.">Beats per loop <input type="number" id="beats" min="0.25" max="64" step="0.25" value="4"></label>
+        <label>Echoes <input type="number" id="echoes" min="1" max="16" value="1"></label>
+        <label>Sustain <input type="range" id="sustain" min="0" max="1" step="0.01" value="0.2"></label>
+        <label>Release <input type="range" id="release" min="0" max="1" step="0.01" value="0.8"></label>
+      </div>
+
+      <div class="steps-bar">
+        <div class="steps-tools">
+          <button id="addStep" class="small" title="Add a step after the current one (N)">Add step</button>
+          <button id="dupStep" class="ghost small" title="Duplicate current step (Ctrl+D)">Duplicate</button>
+          <button id="clearStep" class="ghost small">Clear</button>
+          <button id="leftStep" class="ghost small" aria-label="Move step earlier" title="Move step earlier">◀</button>
+          <button id="rightStep" class="ghost small" aria-label="Move step later" title="Move step later">▶</button>
+          <button id="delStep" class="ghost small danger" title="Delete current step (Delete)">Delete</button>
+        </div>
+        <ol class="steps" id="steps" aria-label="Steps"></ol>
+      </div>
+    </section>
+
+    <aside class="panel slices" aria-label="Slices">
+      <div class="panel-head">
+        <h2>Slices <span class="count" id="sliceCount"></span></h2>
+        <div class="row tight">
+          <button id="allOn" class="ghost small" title="Light every slice in this step">All</button>
+          <button id="allOff" class="ghost small" title="Turn every slice off in this step">None</button>
+        </div>
+      </div>
+      <ul id="sliceList" class="slice-list"></ul>
+      <p class="note" id="skippedNote" hidden></p>
+    </aside>
+  </main>
+
+  <script src="lib/xml.js"></script>
+  <script src="lib/geom.js"></script>
+  <script src="lib/ao.js"></script>
+  <script src="lib/patterns.js"></script>
+  <script src="lib/chasefile.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

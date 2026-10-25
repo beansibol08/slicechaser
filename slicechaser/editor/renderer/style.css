@@ -1,0 +1,209 @@
+/* Stage-blue workspace; lit slices glow tungsten amber like fixtures, cyan marks selection. */
+:root {
+  --night: #161c2b;      /* app background, like a dark FOH booth */
+  --panel: #1e2638;      /* side panels */
+  --raise: #283249;      /* inputs, buttons */
+  --line: #36415c;       /* outlines, dividers */
+  --ink: #e4e8f2;        /* main text */
+  --muted: #8f9ab3;      /* secondary text */
+  --tungsten: #ffb44a;   /* a lit slice */
+  --cyan: #63d0ea;       /* selection, focus, hover */
+  --red: #ff6b6b;
+  --radius-s: 4px;
+  --radius-m: 8px;
+  font-size: 13px;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--night);
+  color: var(--ink);
+  font-family: system-ui, "Segoe UI Variable Text", "Segoe UI", -apple-system, sans-serif;
+  line-height: 1.4;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  user-select: none;
+}
+
+h2 { font-size: 13px; font-weight: 600; margin: 0; }
+button, select, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--cyan); outline-offset: 1px; }
+
+button {
+  background: var(--raise);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-s);
+  padding: 5px 11px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+button:hover:not(:disabled) { border-color: var(--muted); }
+button:disabled { opacity: 0.4; cursor: default; }
+button.ghost { background: transparent; }
+button.small { padding: 3px 8px; }
+button.danger:hover:not(:disabled) { border-color: var(--red); color: var(--red); }
+
+select, input[type="number"] {
+  background: var(--raise);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-s);
+  padding: 4px 6px;
+}
+input[type="number"] { width: 58px; }
+input[type="range"] { width: 90px; accent-color: var(--tungsten); vertical-align: middle; }
+input[type="checkbox"] { accent-color: var(--tungsten); }
+
+.row { display: flex; gap: 6px; flex-wrap: wrap; }
+.row.tight { gap: 4px; }
+
+/* ---------------------------------------------------------------- top bar */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+}
+.brand { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; letter-spacing: 0.01em; }
+.brand-mark {
+  width: 14px; height: 14px; border-radius: 3px;
+  background: linear-gradient(90deg, var(--tungsten) 0 33%, transparent 33% 40%, rgba(255,180,74,.45) 40% 70%, transparent 70% 77%, rgba(255,180,74,.18) 77%);
+}
+.source { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+.source label { color: var(--muted); }
+.source select { max-width: 360px; min-width: 160px; }
+.save { display: flex; align-items: center; gap: 8px; color: var(--muted); }
+.save-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+.save.ok .save-dot { background: var(--tungsten); box-shadow: 0 0 6px var(--tungsten); }
+.save.error { color: var(--red); }
+.save.error .save-dot { background: var(--red); }
+
+/* ---------------------------------------------------------------- layout */
+.workspace {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 240px 1fr 230px;
+}
+.panel {
+  background: var(--panel);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 12px;
+  gap: 10px;
+}
+.panel.sequences { border-right: 1px solid var(--line); }
+.panel.slices { border-left: 1px solid var(--line); }
+.panel-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.count { color: var(--muted); font-weight: 400; }
+
+/* ---------------------------------------------------------------- sequences */
+.seq-list, .slice-list { list-style: none; margin: 0; padding: 0; overflow-y: auto; min-height: 0; }
+.seq-list { flex: 1; }
+.seq-list li {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+  padding: 6px 8px;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.seq-list li:hover { background: var(--raise); }
+.seq-list li.active { border-color: var(--cyan); background: rgba(99, 208, 234, 0.08); }
+.seq-list .seq-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.seq-list .seq-steps { color: var(--muted); font-variant-numeric: tabular-nums; flex: none; }
+.seq-list input { width: 100%; }
+.seq-actions { display: flex; gap: 4px; }
+.seq-actions .danger { margin-left: auto; }
+.panel-head .row button.ghost { padding: 3px 6px; }
+.empty-list { color: var(--muted); padding: 6px 8px; }
+
+.factory { border-top: 1px solid var(--line); padding-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+.check { display: flex; gap: 6px; align-items: center; color: var(--muted); cursor: pointer; }
+
+/* ---------------------------------------------------------------- stage */
+.stage-area { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.stage-wrap {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+#stage { display: block; cursor: crosshair; touch-action: none; }
+.empty {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  text-align: center; padding: 40px;
+}
+.empty p { max-width: 46ch; color: var(--muted); margin: 0; }
+.hover-name {
+  position: absolute; left: 22px; bottom: 22px;
+  background: rgba(22, 28, 43, 0.9); border: 1px solid var(--line);
+  padding: 3px 8px; border-radius: var(--radius-s); pointer-events: none;
+}
+
+.transport {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 8px 14px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+}
+.transport label { display: flex; align-items: center; gap: 6px; }
+.play { min-width: 64px; }
+.play[aria-pressed="true"] { border-color: var(--tungsten); color: var(--tungsten); }
+
+/* ---------------------------------------------------------------- steps lane */
+.steps-bar { border-top: 1px solid var(--line); background: var(--panel); padding: 8px 14px 12px; }
+.steps-tools { display: flex; gap: 4px; margin-bottom: 8px; flex-wrap: wrap; }
+.steps {
+  list-style: none; margin: 0; padding: 2px 2px 6px;
+  display: flex; gap: 6px; overflow-x: auto;
+  min-height: 84px;
+}
+.steps li {
+  flex: none;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 4px;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--line);
+  background: var(--night);
+  cursor: pointer;
+}
+.steps li:hover { border-color: var(--muted); }
+.steps li.current { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan); }
+.steps li.playing .step-num { color: var(--tungsten); }
+.steps canvas { display: block; border-radius: 2px; }
+.step-num { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 11px; }
+.steps .add-cell {
+  justify-content: center; color: var(--muted); border-style: dashed; min-width: 56px; font-size: 18px;
+}
+.steps .hint { color: var(--muted); align-self: center; padding: 0 2px; border: 0; background: none; cursor: default; }
+
+/* ---------------------------------------------------------------- slices list */
+.slice-list { flex: 1; }
+.slice-list .screen-name { color: var(--muted); padding: 8px 4px 2px; font-size: 12px; }
+.slice-list label {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 6px; border-radius: var(--radius-s); cursor: pointer;
+}
+.slice-list label:hover, .slice-list label.hover { background: var(--raise); }
+.slice-list .off { color: var(--muted); }
+.slice-list .slice-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.note { color: var(--muted); margin: 0; font-size: 12px; }
+
+@media (max-width: 1300px) {
+  .workspace { grid-template-columns: 220px 1fr 200px; }
+  .transport { gap: 10px; }
+  input[type="range"] { width: 64px; }
+  input[type="number"] { width: 50px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { scroll-behavior: auto !important; }
+}
